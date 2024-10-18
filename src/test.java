@@ -9,7 +9,7 @@ import static com.raylib.Jaylib.*;
 /**
  * Hauptklasse des Spiels "Survive:io".
  */
-public class Main {
+public class test {
     // Standardgeschwindigkeit der Würfel
     private static float cubeSpeed = 100.0f;
     // Mindestabstand zum Spieler, in dem keine Würfel spawnen dürfen
@@ -29,6 +29,8 @@ public class Main {
         boolean debugmouse = IsKeyDown(KEY_F9);
         boolean switchState = false;
         while (!WindowShouldClose()) {
+
+
             BeginDrawing();
             debugmouse = false;
             Raylib.Vector2 mousePosition = GetMousePosition();
@@ -178,7 +180,7 @@ public class Main {
     /**
      * Initialisiert das Spiel, setzt die Fenstergröße und die Framerate.
      */
-    public static void initGame() {
+    public static void initGame(){
         int screenWidth = 1920;
         int screenHeight = 1000;
 
@@ -202,8 +204,8 @@ public class Main {
         float cubeSpawnInterval = random.nextFloat() * 2;
 
         int lives = 10; // Deklaration der Leben außerhalb der Schleife
-
         while (!WindowShouldClose()) {
+
             Raylib.Vector2 mousePosition = GetMousePosition();
             BeginDrawing();
             ClearBackground(RAYWHITE);
@@ -231,6 +233,10 @@ public class Main {
                 dx *= scale;
                 dy *= scale;
             }
+            shootfuc shoot = new shootfuc((Jaylib.Vector2) circlePosition, dx, dy, distance);
+            if (IsKeyPressed(KEY_SPACE)) {
+                shoot.shoot(deltaTime, speed);
+            }
 
             DrawLineEx(new Jaylib.Vector2(circlePosition.x(), circlePosition.y()), new Jaylib.Vector2().x(circlePosition.x() + dx).y(circlePosition.y() + dy), 5.0f, RED);
 
@@ -254,17 +260,9 @@ public class Main {
 
             System.out.println("Mouse Position: (" + mousePosition.x() + ", " + mousePosition.y() + ")");
 
-            // Ball nur erscheinen lassen, wenn die Leertaste gedrückt wird
-            if (IsKeyPressed(KEY_SPACE)) {
-                var newBallPosition = new Jaylib.Vector2().x(circlePosition.x() + dx).y(circlePosition.y() + dy);
-                var newBallDirection = new Jaylib.Vector2().x(dx / distance).y(dy / distance);
-                // Normalisieren der Richtung
-                float length = (float) Math.sqrt(newBallDirection.x() * newBallDirection.x() + newBallDirection.y() * newBallDirection.y());
-                newBallDirection.x(newBallDirection.x() / length);
-                newBallDirection.y(newBallDirection.y() / length);
-                ballPositions.add((Jaylib.Vector2) newBallPosition);
-                ballDirections.add((Jaylib.Vector2) newBallDirection);
-            }
+
+
+
 
             // Würfel zufällig spawnen lassen
             cubeSpawnTimer -= deltaTime;
@@ -402,5 +400,43 @@ public class Main {
                 ballPosition.x() + ballRadius > cubePosition.x() &&
                 ballPosition.y() < cubePosition.y() + cubeSize &&
                 ballPosition.y() + ballRadius > cubePosition.y();
+    }
+
+}
+class shootfuc extends test {
+
+    private Jaylib.Vector2 circlePosition;
+    private float dx, dy, distance;
+    private List<Jaylib.Vector2> ballPositions = new ArrayList<>();
+    private List<Jaylib.Vector2> ballDirections = new ArrayList<>();
+
+    public shootfuc(Jaylib.Vector2 circlePosition, float dx, float dy, float distance) {
+        this.circlePosition = circlePosition;
+        this.dx = dx;
+        this.dy = dy;
+        this.distance = distance;
+    }
+
+    public void shoot(float deltaTime, float speed) {
+        var newBallPosition = new Jaylib.Vector2().x(circlePosition.x() + dx).y(circlePosition.y() + dy);
+        var newBallDirection = new Jaylib.Vector2().x(dx / distance).y(dy / distance);
+        float length = (float) Math.sqrt(newBallDirection.x() * newBallDirection.x() + newBallDirection.y() * newBallDirection.y());
+        newBallDirection.x(newBallDirection.x() / length);
+        newBallDirection.y(newBallDirection.y() / length);
+        ballPositions.add((Jaylib.Vector2) newBallPosition);
+        ballDirections.add((Jaylib.Vector2) newBallDirection);
+
+        for (int i = 0; i < ballPositions.size(); i++) {
+            var ballPosition = ballPositions.get(i);
+            var ballDirection = ballDirections.get(i);
+            ballPosition.x(ballPosition.x() + ballDirection.x() * speed * deltaTime);
+            ballPosition.y(ballPosition.y() + ballDirection.y() * speed * deltaTime);
+            DrawCircleV(ballPosition, 5.0f, BLUE);
+
+            if (ballPosition.x() >= 1920 || ballPosition.x() <= 0 || ballPosition.y() >= 1000 || ballPosition.y() <= 0) {
+                ballPositions.remove(i);
+                ballDirections.remove(i);
+            }
+        }
     }
 }
