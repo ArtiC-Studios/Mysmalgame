@@ -25,7 +25,8 @@ public class Main {
         int screenHeight = 450;
         InitWindow(screenWidth, screenHeight, "Main Menü Survive:io");
         SetTargetFPS(60);
-
+        var circlePosition = new Jaylib.Vector2().x(screenWidth / 2.0f).y(screenHeight / 2.0f);
+        var ballSpeed = 80.0f;
         boolean debugmouse = IsKeyDown(KEY_F9);
         boolean switchState = false;
         while (!WindowShouldClose()) {
@@ -41,6 +42,7 @@ public class Main {
                 break;
             }
 
+            DrawText("To Try the Controlls press F", screenWidth / 2 - MeasureText("To Try the Controlls press F", 15) / 2, screenHeight / 2, 15, WHITE);
             DrawText("Survive", 322, 102, 40, BLACK);
             DrawText("Survive", screenWidth / 2 - MeasureText("Survive:", 20), 100, 40, RED);
             DrawText("Press Enter to start the game", 241, 171, 20, BLACK);
@@ -108,19 +110,22 @@ public class Main {
             }
             if (switchState) {
                 // Code für true
-                float deltaTime = GetFrameTime();
-                var circlePosition = new Jaylib.Vector2().x(screenWidth / 2.0f).y(screenHeight / 2.0f);
-                var ballSpeed = 80.0f;
 
-                if (IsKeyDown(68))
-                    circlePosition.x(circlePosition.x() + ballSpeed * deltaTime);
-                if (IsKeyDown(65))
-                    circlePosition.x(circlePosition.x() - ballSpeed * deltaTime);
-                if (IsKeyDown(87))
-                    circlePosition.y(circlePosition.y() - ballSpeed * deltaTime);
-                if (IsKeyDown(83))
-                    circlePosition.y(circlePosition.y() + ballSpeed * deltaTime);
-                DrawCircleV(circlePosition, 10.0f, BLUE);
+
+                while (switchState == true) {
+                    float deltaTime = GetFrameTime();
+                    if (IsKeyDown(68))
+                            circlePosition.x(circlePosition.x() + ballSpeed * deltaTime);
+                    if (IsKeyDown(65))
+                            circlePosition.x(circlePosition.x() - ballSpeed * deltaTime);
+                    if (IsKeyDown(87))
+                            circlePosition.y(circlePosition.y() - ballSpeed * deltaTime);
+                    if (IsKeyDown(83))
+                            circlePosition.y(circlePosition.y() + ballSpeed * deltaTime);
+                    DrawCircleV(circlePosition, 10.0f, BLUE);
+                    break;
+                }
+
 
                 // Spielerpositionen überprüfen und anpassen
 
